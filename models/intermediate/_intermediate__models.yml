@@ -1,0 +1,53 @@
+version: 2
+
+models:
+  - name: int_ledger_by_pnl_line
+    description: Monthly ledger totals per company, account and P&L line.
+
+  - name: int_allocation_drivers
+    description: Each operating company's share of every allocation driver (headcount, net revenue) per month.
+    columns:
+      - name: driver_share
+        data_tests:
+          - dbt_utils.accepted_range: {arguments: {min_value: 0, max_value: 1}}
+
+  - name: int_shared_costs_allocated
+    description: Shared service center costs allocated to operating companies according to seeds/allocation_rules.csv.
+
+  - name: int_ipca_deflator
+    description: Factor to restate nominal BRL in prices of the `real_terms_base_month` var.
+    columns:
+      - name: reference_month
+        data_tests: [unique, not_null]
+
+unit_tests:
+  - name: shared_costs_are_split_by_the_driver_of_each_account
+    description: Payroll follows headcount and third-party services follow net revenue; nothing is lost in the split.
+    model: int_shared_costs_allocated
+    given:
+      - input: ref('int_ledger_by_pnl_line')
+        rows:
+          - {company_id: C00, reference_month: 2025-01-01, account_code: "5.2.01", amount_brl: -1000}
+          - {company_id: C00, reference_month: 2025-01-01, account_code: "5.3.03", amount_brl: -500}
+          - {company_id: C01, reference_month: 2025-01-01, account_code: "3.1.01", amount_brl: 9000}
+      - input: ref('stg_erp__companies')
+        rows:
+          - {company_id: C00, is_shared_service_center: true}
+          - {company_id: C01, is_shared_service_center: false}
+          - {company_id: C02, is_shared_service_center: false}
+      - input: ref('allocation_rules')
+        rows:
+          - {account_code: "5.2.01", allocation_driver: headcount}
+          - {account_code: "5.3.03", allocation_driver: net_revenue}
+      - input: ref('int_allocation_drivers')
+        rows:
+          - {allocation_driver: headcount, company_id: C01, reference_month: 2025-01-01, driver_share: 0.75}
+          - {allocation_driver: headcount, company_id: C02, reference_month: 2025-01-01, driver_share: 0.25}
+          - {allocation_driver: net_revenue, company_id: C01, reference_month: 2025-01-01, driver_share: 0.6}
+          - {allocation_driver: net_revenue, company_id: C02, reference_month: 2025-01-01, driver_share: 0.4}
+    expect:
+      rows:
+        - {company_id: C01, account_code: "5.2.01", allocated_amount_brl: -750}
+        - {company_id: C02, account_code: "5.2.01", allocated_amount_brl: -250}
+        - {company_id: C01, account_code: "5.3.03", allocated_amount_brl: -300}
+        - {company_id: C02, account_code: "5.3.03", allocated_amount_brl: -200}

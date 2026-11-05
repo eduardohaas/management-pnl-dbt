@@ -1,0 +1,16 @@
+account_code,pnl_line
+3.1.01,gross_revenue
+3.1.02,gross_revenue
+3.2.01,deductions
+3.2.02,deductions
+4.1.01,cost_of_sales
+4.1.02,cost_of_sales
+5.1.01,selling_expenses
+5.1.02,selling_expenses
+5.2.01,personnel_expenses
+5.3.01,administrative_expenses
+5.3.02,administrative_expenses
+5.3.03,administrative_expenses
+6.1.01,financial_result
+6.1.02,financial_result
+7.1.01,income_tax

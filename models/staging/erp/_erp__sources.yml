@@ -1,0 +1,13 @@
+version: 2
+
+sources:
+  - name: erp
+    description: Nightly extract of the group's ERP (synthetic data, see ingestion/generate_erp_data.py).
+    schema: raw
+    tables:
+      - name: erp_companies
+      - name: erp_chart_of_accounts
+      - name: erp_general_ledger
+        description: One row per ledger posting. The ERP re-exports some lines, so entry_id is NOT unique here.
+      - name: hr_headcount
+        description: Monthly headcount per company, from the HR system.

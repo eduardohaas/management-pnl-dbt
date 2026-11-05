@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: stg_bcb__ipca_monthly
+    description: Monthly IPCA as a rate (0.0042 = 0.42%).
+    columns:
+      - name: reference_month
+        data_tests: [unique, not_null]
+      - name: ipca_rate
+        data_tests:
+          - not_null
+          - dbt_utils.accepted_range: {arguments: {min_value: -0.05, max_value: 0.05}}

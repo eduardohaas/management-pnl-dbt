@@ -1,0 +1,49 @@
+version: 2
+
+models:
+  - name: dim_companies
+    description: Companies of the group, flagging the shared service center.
+    columns:
+      - name: company_id
+        data_tests: [unique, not_null]
+
+  - name: dim_accounts
+    description: Chart of accounts with the P&L line each account rolls up to.
+    columns:
+      - name: account_code
+        data_tests: [unique, not_null]
+      - name: pnl_line
+        description: Every account must be mapped; a new ERP account without mapping fails here.
+        data_tests: [not_null]
+
+  - name: fct_management_pnl
+    description: >
+      Management P&L (Brazilian "DRE gerencial") per operating company, month and P&L line,
+      in nominal BRL and in constant prices of the `real_terms_base_month` var (deflated by IPCA).
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments: {combination_of_columns: [company_id, reference_month, pnl_line]}
+    columns:
+      - name: company_id
+        data_tests:
+          - not_null
+          - relationships: {arguments: {to: ref('dim_companies'), field: company_id}}
+      - name: pnl_line
+        data_tests:
+          - not_null
+          - relationships: {arguments: {to: ref('pnl_lines'), field: pnl_line}}
+      - name: amount_brl
+        data_tests: [not_null]
+      - name: amount_brl_real
+        description: Amount restated in base-month prices. Null only if IPCA for that month is missing.
+        data_tests: [not_null]
+
+  - name: rpt_pnl_monthly
+    description: Wide P&L per company and month, with subtotals (net revenue, gross profit, operating result, net income) and margins.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments: {combination_of_columns: [company_id, reference_month]}
+    columns:
+      - name: gross_margin
+        data_tests:
+          - dbt_utils.accepted_range: {arguments: {min_value: 0, max_value: 1}}

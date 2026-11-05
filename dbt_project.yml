@@ -1,0 +1,30 @@
+name: management_pnl
+version: "1.0.0"
+config-version: 2
+profile: management_pnl
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+clean-targets: ["target", "dbt_packages"]
+
+vars:
+  # Month whose prices the inflation-adjusted figures are expressed in.
+  real_terms_base_month: "2025-12-01"
+
+models:
+  management_pnl:
+    staging:
+      +materialized: view
+      +schema: staging
+    intermediate:
+      +materialized: view
+      +schema: intermediate
+    marts:
+      +materialized: table
+      +schema: marts
+
+seeds:
+  management_pnl:
+    +schema: business_rules

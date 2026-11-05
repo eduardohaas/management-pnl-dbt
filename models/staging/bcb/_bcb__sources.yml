@@ -1,0 +1,12 @@
+version: 2
+
+sources:
+  - name: bcb
+    description: Central Bank of Brazil open data (SGS), loaded incrementally by ingestion/load_bcb_ipca.py.
+    schema: raw
+    tables:
+      - name: bcb_ipca_monthly
+        description: IPCA monthly % change (SGS series 433).
+        loaded_at_field: loaded_at
+        freshness:
+          warn_after: {count: 35, period: day}

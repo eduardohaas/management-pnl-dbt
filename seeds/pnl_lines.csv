@@ -1,0 +1,10 @@
+pnl_line,pnl_line_label,pnl_line_order
+gross_revenue,Gross revenue,1
+deductions,(-) Sales deductions,2
+cost_of_sales,(-) Cost of sales,3
+selling_expenses,(-) Selling expenses,4
+personnel_expenses,(-) Personnel expenses,5
+administrative_expenses,(-) Administrative expenses,6
+shared_service_allocation,(-) Shared service center allocation,7
+financial_result,(+/-) Financial result,8
+income_tax,(-) Income tax,9

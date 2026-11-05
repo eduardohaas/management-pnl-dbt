@@ -1,0 +1,40 @@
+version: 2
+
+models:
+  - name: stg_erp__general_ledger
+    description: Deduplicated ledger postings with a signed amount (revenue +, expenses -).
+    columns:
+      - name: entry_id
+        data_tests: [unique, not_null]
+      - name: company_id
+        data_tests:
+          - not_null
+          - relationships: {arguments: {to: ref('stg_erp__companies'), field: company_id}}
+      - name: account_code
+        data_tests:
+          - not_null
+          - relationships: {arguments: {to: ref('stg_erp__chart_of_accounts'), field: account_code}}
+      - name: posting_date
+        data_tests: [not_null]
+
+  - name: stg_erp__companies
+    columns:
+      - name: company_id
+        data_tests: [unique, not_null]
+
+  - name: stg_erp__chart_of_accounts
+    columns:
+      - name: account_code
+        data_tests: [unique, not_null]
+      - name: nature
+        data_tests:
+          - accepted_values: {arguments: {values: ['credit', 'debit']}}
+
+  - name: stg_hr__headcount
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments: {combination_of_columns: [company_id, reference_month]}
+    columns:
+      - name: headcount
+        data_tests:
+          - dbt_utils.accepted_range: {arguments: {min_value: 1}}
