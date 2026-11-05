@@ -3,6 +3,13 @@
 [![dbt build](https://github.com/eduardohaas/management-pnl-dbt/actions/workflows/dbt.yml/badge.svg)](https://github.com/eduardohaas/management-pnl-dbt/actions/workflows/dbt.yml)
 [![dbt docs](https://img.shields.io/badge/dbt%20docs-live-0b6e5f)](https://eduardohaas.github.io/management-pnl-dbt/)
 
+> **Resumo em português** — DRE gerencial de um grupo com 3 empresas que dividem um centro de serviços compartilhados (CSC). O projeto rateia os custos do CSC por regra de negócio (folha, aluguel e TI por headcount; terceiros por receita líquida) e corrige os valores pelo IPCA, buscado na API do Banco Central.
+> - **A Logística parece a empresa mais rentável até pagar a sua parte do CSC:** perde 8,8 pontos de margem operacional, porque tem muita gente para pouca receita.
+> - **A receita cresceu 6,7% no nominal e só 1,6% no real** (preços de dez/2025): quase todo o crescimento é inflação.
+> - Camadas dbt (staging → intermediate → marts), regras de negócio versionadas em seeds, 38 testes (incluindo unit test do rateio e reconciliação com o razão contábil) e CI com documentação publicada.
+>
+> Dados da empresa fictícios; IPCA real. Documentação técnica em inglês abaixo.
+
 A group of companies shares one back office. Finance needs to know **how profitable each company really is** once that back office is paid for, and **how much of the growth is real** after inflation. This project turns a messy ERP extract into that answer, with the business rules versioned, tested and documented.
 
 It is a public, synthetic version of the kind of management P&L (Brazilian *DRE gerencial*) I build for clients. The data is generated, the rules and the engineering are the real thing.
